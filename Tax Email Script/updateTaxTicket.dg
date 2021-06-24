@@ -1,0 +1,59 @@
+/**
+ * updateTaxTicket.dg
+ * 
+ * Update Tax Ticket
+ * Completes the ticket information when a ticket was created from a specific email source.
+ * @param  int ticket_id The ticket ID
+ * @return void
+ */
+// Change this to the value in Settings > Developer Space > API > OrgId
+org_id = 00000000;
+// Expected email
+sent_to_address = "tax@chspayroll.zohodesk.com";
+// Getting the ticket full history
+response = invokeurl
+[
+    url :"https://desk.zoho.com/api/v1/tickets/" + ticket_id + "/History"
+    type :GET
+    connection:"deskoauth"
+];
+// Looking for the Creation Record
+for each  record in response.get("data")
+{
+    if(record.get("eventName") == "TicketCreated")
+    {
+        // Lest find the email the ticket was send to originaly
+        for each  registry in record.get("eventInfo")
+        {
+            if(registry.get("propertyName") == "To Address")
+            {
+                if(registry.get("propertyValue") == sent_to_address)
+                {
+                    info "Is a Tax ticket: ";
+                    // Map for the changes, to look for the API names go to 
+                    // Customization > Layouts and Fields > Field List = "Tickets"  
+                    update_map = Map();
+                    // If the API names have a "cf" in front of them, they beloung inside another map
+                    cf = Map();
+                    // Department 1
+                    cf.put("cf_department_1","Tax");
+                    // Issue Type
+                    cf.put("cf_issue_type","Inquiry");
+                    // Project
+                    cf.put("cf_project","Agency Notice");
+                    // Item
+                    cf.put("cf_item","Notice - FYI");
+                    // Saving the custom fields info
+                    update_map.put("cf",cf);
+                    // Updating the ticket information
+                    info zoho.desk.update(org_id,"tickets",ticket_id,update_map);
+                    return;
+                }
+                // Not a Tax ticket, saving a bit of time.
+                info "Not a tax ticket, sent to: " + registry.get("propertyValue");
+                return;
+            }
+        }
+    }
+}
+return;
