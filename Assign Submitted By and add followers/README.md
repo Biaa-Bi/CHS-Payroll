@@ -58,7 +58,7 @@
         - If there's no connection to **ZOHO Desk**, create one
             - Click on `MY CONNECTIONS`
             - Click on `CREATE CONNECTION`
-            - Fin **ZOHO Desk**
+            - Find **ZOHO Desk**
             - Name the connection
             - On *Use this connection to execute*
                 - Select **Only specific triggers and actions**
