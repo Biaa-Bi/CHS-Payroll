@@ -5,7 +5,7 @@
     - Changes the field "Ticket Creator" to an agent's name with a corresponding email and adds two followers to the ticket.
     - Add app trigger from **ZOHO Forms**
         - Select: **Entry submitted - New version**
-        - If there's no connection to **ZOHO Flow**, create one
+        - If there's no connection to **ZOHO Forms**, create one
             - Click on `NEW`
             - Name the connection
             - On *Use this connection to execute*
