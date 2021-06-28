@@ -1,0 +1,96 @@
+string updateTicketForm(int follower_1_id, int follower_2_id, string email, string ticket_subject)
+{
+/**
+ * updateTicketForm.dg
+ * 
+ * Update Ticket Form
+ * Updates a ticket in ZOHO Desk when it's created form a Form adding two agents
+ * to the followers list and changes the "Ticket Creator" field from an email to
+ * an agent name.
+ * Input:
+ *      (int) follower_1_id :       The 1st agent ID to follow this ticket.
+ *      (int) follower_2_id :       The 2nd agent ID to follow this ticket.
+ *      (string) email:             The email of "Submitted By".
+ *      (string) ticket_subject:    The subject of the newly created ticket.
+ * Output:
+ *      (string) A completion message or an error message.
+ */
+    // Change this to the value in ZOHO Desk > Settings > Developer Space > API > OrgId
+    org_id = 000000000;
+    // Change this to the value in ZOHO Desk > Settings > Customization > Layouts and Fields > Select "Tickets" > Select the Department > Select the Layout > Find field 'Ticket Creator' > Edit Properties > API Name
+    ticket_creator_api_name = "cf_ticket_creator";
+    // Searching the Agent
+    search_agent = Map();
+    search_agent.put("status","ACTIVE");
+    search_agent.put("searchStr",email);
+    // Please update the desk connection name
+    agent_response = invokeurl
+    [
+        url :"https://desk.zoho.com/api/v1/agents"
+        type :GET
+        parameters:search_agent
+        headers:{"orgId":org_id}
+        connection:"zoho_desk"
+    ];
+    if(agent_response.isNull() || agent_response.get("data").isNull() || agent_response.get("data").size() < 1)
+    {
+        info "Error: " + agent_response;
+        return "Unable to find an agent with the email: \"" + email + "\"";
+    }
+    agent_name = agent_response.get("data").get("0").get("firstName") + " " + agent_response.get("data").get("0").get("lastName");
+    info "Agent Name: " + agent_name;
+    // Searching the ticket
+    search_ticket = Map();
+    search_ticket.put("subject",ticket_subject);
+    search_ticket.put("status","${OPEN}");
+    search_ticket.put("customField1",ticket_creator_api_name + ":" + email);
+    // Please update the desk connection name
+    ticket_response = zoho.desk.searchRecords(org_id,"Tickets",search_ticket,0,1,"zoho_desk");
+    if(ticket_response.get("data").isNull() || ticket_response.get("data").size() < 1)
+    {
+        info "Error: " + ticket_response;
+        return "Unable to find an Open ticket with subject: \"" + ticket_subject + "\" & Ticket Creator: \"" + email + "\"";
+    }
+    ticket_id = ticket_response.get("data").get("0").get("id");
+    info "Ticket ID: " + ticket_id;
+    // Changing the value of "Ticket Creator"
+    cf = Map();
+    cf.put(ticket_creator_api_name,agent_name);
+    ticket_update = Map();
+    ticket_update.put("cf",cf);
+    info "Replacing the name:";
+    // Please update the desk connection name
+    update_response = zoho.desk.update(org_id,"tickets",ticket_id,ticket_update,"zoho_desk");
+    if(update_response.get("id").isNull())
+    {
+        info "Error: " + update_response;
+        return "Unable to change the Ticket Creator";
+    }
+    info "Successfully changed Ticket Creator to \"" + agent_name + "\"";
+    // Adding the followers
+    follow_list = List();
+    follow_list.add(follower_1_id);
+    follow_list.add(follower_2_id);
+    ticket_followers = Map();
+    ticket_followers.put("followerIds",follow_list);
+    // Please update the desk connection name
+    followers_response = invokeurl
+    [
+        url :"https://desk.zoho.com/api/v1/tickets/" + ticket_id + "/addFollowers"
+        type :POST
+        parameters:ticket_followers.toString()
+        headers:{"orgId":org_id}
+        connection:"zoho_desk"
+    ];
+    info "Adding followers:";
+    if(followers_response.isNull())
+    {
+        info "Successfully following the Ticket.";
+    }
+    else
+    {
+        info "Error: " + followers_response;
+        return "Error, couldn't follow the ticket";
+    }
+    return "Successful";
+}
