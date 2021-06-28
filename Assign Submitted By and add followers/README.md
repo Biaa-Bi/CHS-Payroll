@@ -76,16 +76,16 @@
         - Click the [X] mark in the top right corner
         - Add `updateTicketForm` as the last step to the flow
             - follower_1_id
-                - Click **Follower 1 ID** form the list to the right
+                - Click **Follower 1 ID** in the list to the right
                 - Select your variable 
             - follower_2_id
-                - Click **Follower 2 ID** form the list to the right
+                - Click **Follower 2 ID** in the list to the right
                 - Select your variable 
             - email
-                - Click **Entry submitted - New version** form the list to the right
+                - Click **Entry submitted - New version** in the list to the right
                 - Select **Submitted By**
             - ticket_subject 
-                - Click **Entry submitted - New version** form the list to the right
+                - Click **Entry submitted - New version** in the list to the right
                 - Select **Subject**
     - In the upper right corner, click on `YOUR FLOW IS` from **OFF** to **ON**
     - Test the Flow creating an entry in your form.
