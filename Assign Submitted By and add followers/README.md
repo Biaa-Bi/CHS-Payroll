@@ -1,5 +1,5 @@
 <sup><sup><p align="right">**Task 22544244**</p></sup></sup>
-# CHS Payroll: *Assign "Submitted By" and add followers.*
+# CHS Payroll: *Assign "Submitted By" and add followers*
 ## ZOHO Flow
 - New **Flow** `Ticket Creation Form`
     - Changes the field "Ticket Creator" to an agent's name with a corresponding email and adds two followers to the ticket.
@@ -7,6 +7,7 @@
         - Select: **Entry submitted - New version**
         - If there's no connection to **ZOHO Forms**, create one
             - Click on `NEW`
+            - Find **ZOHO Forms**
             - Name the connection
             - On *Use this connection to execute*
                 - Select **Only specific triggers and actions**
@@ -41,6 +42,7 @@
                     - i.e. `https://desk.zoho.com/support/ORG_NAME/ShowHomePage.do#setup/users-control/agents/615417000000139001`
                 - Paste **615417000000139001** in value
             - Click `Done`
+        - Rename this step to **Follower 2 ID**
     - In Flow > Logic > Custom Functions
         - Click on `+ Custom Function`
         - Function name **updateTicketForm**
@@ -55,6 +57,8 @@
         - Copy the content of ***updateTicketForm.dg***
         - If there's no connection to **ZOHO Desk**, create one
             - Click on `MY CONNECTIONS`
+            - Click on `CREATE CONNECTION`
+            - Fin **ZOHO Desk**
             - Name the connection
             - On *Use this connection to execute*
                 - Select **Only specific triggers and actions**
