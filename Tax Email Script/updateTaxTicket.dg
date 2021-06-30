@@ -22,7 +22,7 @@ for each  record in response.get("data")
 {
     if(record.get("eventName") == "TicketCreated")
     {
-        // Lest find the email the ticket was send to originaly
+        // Lest find the email the ticket was sent to originally
         for each  registry in record.get("eventInfo")
         {
             if(registry.get("propertyName") == "To Address")
@@ -33,7 +33,7 @@ for each  record in response.get("data")
                     // Map for the changes, to look for the API names go to 
                     // Customization > Layouts and Fields > Field List = "Tickets"  
                     update_map = Map();
-                    // If the API names have a "cf" in front of them, they beloung inside another map
+                    // If the API names have a "cf" in front of them, they belong inside another map
                     cf = Map();
                     // Department 1
                     cf.put("cf_department_1","Tax");
