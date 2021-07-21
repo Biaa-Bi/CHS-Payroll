@@ -1,13 +1,11 @@
 org_id = 753054590;
-search_query =  {"email":"testing@mail.com"};
-contacts_search = zoho.desk.searchRecords(org_id,"contacts",search_query);
-info contacts_search;
+query =  {"email":"test@mail.com"};
+contacts_search = zoho.desk.getRecords(org_id,"contacts");
 contacts_list = List();
 for each  contact in contacts_search.get("data")
 {
     contacts_list.add(contact.get("id"));
 }
-info contacts_list.size();
 update_map = Map();
 update_map.put("secondaryContacts",contacts_list);
 info zoho.desk.update(org_id,"tickets",id,update_map);
