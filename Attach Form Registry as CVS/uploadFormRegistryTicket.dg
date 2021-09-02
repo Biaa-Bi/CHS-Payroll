@@ -11,7 +11,7 @@ string uploadFormRegistryTicket(map entry_form)
  *      (string) A completion message or an error message.
  */
 // Change this to the value in ZOHO Desk > Settings > Developer Space > API > OrgId
-org_id = 753054590;
+org_id = 725793237;
 // Change this to the name in the Flow Webhook Integration corresponding to the "Submitted By" email.
 submitted_by = "Submitted_By";
 // Change this to the name in the Flow Webhook Integration corresponding to the "Subject" field.
@@ -25,13 +25,13 @@ ticket_subject = entry_form.get(ticket_subject_API);
 search_ticket = Map();
 search_ticket.put("subject",ticket_subject);
 search_ticket.put("status","${OPEN}");
-search_ticket.put("customField1",ticket_creator_api_name + ":" + email);
+//search_ticket.put("customField1",ticket_creator_api_name + ":" + email);
 // Please update the desk connection name
-ticket_response = zoho.desk.searchRecords(org_id,"Tickets",search_ticket,0,1,"test_desk");
+ticket_response = zoho.desk.searchRecords(org_id,"Tickets",search_ticket,0,1,"desk");
 if(ticket_response.get("data").isNull() || ticket_response.get("data").size() < 1)
 {
     info "Error: " + ticket_response;
-    return "Unable to find an Open ticket with subject: \"" + ticket_subject + "\" & Ticket Creator: \"" + email + "\"";
+    return "Unable to find an Open ticket with subject: \"" + ticket_subject + "\"";
 }
 ticket_id = ticket_response.get("data").get("0").get("id");
 info "Ticket ID: " + ticket_id;
@@ -40,23 +40,29 @@ titles_cvs = "";
 values_cvs = "";
 for each  key in entry_form.keys()
 {
-    values_cvs = values_cvs + entry_form.get(key) + ",";
-    titles_cvs = titles_cvs + key.replaceAll("_"," ") + ",";
+    values_cvs = values_cvs + "\"" + entry_form.get(key) + "\"" + ",";
+    titles_cvs = titles_cvs + "\"" + key.replaceAll("_"," ") + "\"" + ",";
 }
-cvs_file = (titles_cvs + "\n" + values_cvs).tofile("TicketCreator_Entry.csv");
+file_content = titles_cvs.removeLastOccurence(",") + "\n" + values_cvs.removeLastOccurence(",");
+info file_content;
+cvs_file = file_content.tofile("TicketCreator_Entry.csv");
 info "Uploading the file";
 info cvs_file;
+cvs_file.setParamName("file");
 params_map = Map();
-params_map.put("File",cvs_file);
+params_map.put("isPublic","false");
+params_map.put("Content-Type","multipart/form-data");
 // Please update the desk connection name
 response = invokeurl
 [
     url :"https://desk.zoho.com/api/v1/tickets/" + ticket_id + "/attachments"
     type :POST
-    parameters:params_map.toString()
+    parameters:params_map
     headers:{"orgId":org_id}
-    connection:"test_desk"
+    files:cvs_file
+    connection:"desk"
 ];
+info response;
 if(response.isNull())
 {
     info "Successfully upload to the Ticket.";

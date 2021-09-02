@@ -57,3 +57,25 @@ for each  record in response.get("data")
     }
 }
 return;
+
+
+
+// Change "Submitted by" email to Name
+
+// Search Contact from Email
+contact_search = invokeurl
+[
+    url :"https://desk.zoho.com/api/v1/contacts/search?email=" + EMAIL_VAR
+    type :GET
+    headers:{"orgId":org_id}
+    connection:"deskoauth"
+];
+update_map = Map();
+if (contact_search.get("data").size() > 1) {
+    update_map.put("contactId",contact_search.get("data").get(0).get("id"));
+}
+cf = Map();
+cf.put("cf_submited_by",SUBMITED_BY_VAR);
+update_map.put("cf",cf);
+info zoho.desk.update(org_id,"tickets",ticket_id,update_map);
+return;
